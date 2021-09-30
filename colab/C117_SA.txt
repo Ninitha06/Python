@@ -1,0 +1,66 @@
+from google.colab import files
+files_to_load = files.upload()
+
+import pandas as pd
+
+df = pd.read_csv("C117_TA.csv")
+
+
+factors = df[["age","sex","chol","cp","thalach"]]
+heart_attack = df["target"]
+
+from sklearn.model_selection import train_test_split
+
+factors_train,factors_test,heart_attack_train,heart_attack_test = train_test_split(factors,heart_attack,test_size=0.25,random_state=0)
+
+from sklearn.preprocessing import StandardScaler
+
+sc = StandardScaler();
+
+factors_train = sc.fit_transform(factors_train)
+factors_test = sc.transform(factors_test)
+
+from sklearn.linear_model import LogisticRegression
+
+lr = LogisticRegression(random_state=0)
+lr.fit(factors_train,heart_attack_train)
+
+heart_attack_predict = lr.predict(factors_test)
+
+predicted_values = []
+for i in heart_attack_predict:
+  if i==1:
+    predicted_values.append("Yes")
+  else:
+    predicted_values.append("No")
+
+actual_values = []
+for i in heart_attack_test:
+  if i==1:
+    actual_values.append("Yes")
+  else:
+    actual_values.append("No")
+
+labels = ["No","Yes"]
+
+from sklearn.metrics import confusion_matrix
+
+cm = confusion_matrix(actual_values,predicted_values,labels)
+
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+ax = plt.subplot()
+sns.heatmap(cm,annot=True,ax=ax)
+ax.set_xlabel("Predicted")
+ax.set_ylabel("Actual")
+# labels appear in the same order as given in list. First value for 0, second value for 1..
+ax.xaxis.set_ticklabels(labels)
+ax.yaxis.set_ticklabels(labels)
+
+
+
+accuracy = (33+23)/(33+23+10+10)
+print(accuracy)
+
+

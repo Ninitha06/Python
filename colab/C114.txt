@@ -1,0 +1,107 @@
+from google.colab import files
+data_to_load = files.upload()
+
+
+import pandas as pd
+import plotly.express as px
+
+df=pd.read_csv("C114.csv")
+
+height = df["Height"].tolist()
+weight = df["Weight"].tolist()
+
+
+
+
+
+
+m=0.95
+c=-93
+y=[]
+for x in height:
+  y_value = m * x + c
+  y.append(y_value)
+
+fig=px.scatter(x=height,y=weight)
+fig.update_layout(shapes=[dict(type="line",y0=min(y),y1=max(y),x0=min(height),x1=max(height))])
+fig.show()
+
+x=250
+y=m*x+c
+print(f"Weight of someone whose height 250 is {y}")
+
+The NumPy arrays takes significantly less amount of memory as compared to python lists. It also provides a mechanism of specifying the data types of the contents, which allows further optimisation of the code.
+
+import numpy as np
+
+height = np.array(height)
+weight = np.array(weight)
+
+# 1 is degree of polynomial
+m,c=np.polyfit(height,weight,1);
+
+y=[]
+for x in height:
+  y_value = m*x+c
+  y.append(y_value)
+
+fig = px.scatter(x=height,y=weight)
+fig.update_layout(shapes=[dict(type="line",x0=min(height),x1=max(height),y0=min(y),y1=max(y))])
+fig.show()
+
+x=250
+y = m * x +c
+print(f"WEight of person with height 250 is {y}")
+
+from google.colab import files
+data_to_load = files.upload()
+
+import pandas as pd
+import plotly.express as px
+
+df = pd.read_csv("C114_SA.csv")
+
+Gre_score = df["GRE Score"].tolist()
+#Unnecessary space
+chances_of_admit = df["Chance of Admit "].tolist()
+
+fig = px.scatter(x=Gre_score,y=chances_of_admit)
+fig.show()
+
+m = 0.01
+c = -2.5
+
+y=[]
+for x in Gre_score:
+  y_value = m * x + c
+  y.append(y_value)
+
+fig=px.scatter(x=Gre_score,y=chances_of_admit)
+fig.update_layout(shapes=[dict(type='line',x0=min(Gre_score),x1=max(Gre_score),y0=min(y),y1=max(y))])
+fig.show()
+
+x = 650
+y = m * x + c
+print(f"Chance of admit for Gre score  650 is {y}")
+
+import numpy as np
+
+gre_score_arr = np.array(Gre_score)
+chances_admit_arr = np.array(chances_of_admit)
+
+m,c = np.polyfit(gre_score_arr,chances_admit_arr,1)
+
+y=[]
+for x in gre_score_arr:
+  y_value=m*x+ c
+  y.append(y_value)
+
+fig=px.scatter(x=gre_score_arr,y=chances_admit_arr)
+fig.update_layout(shapes=[dict(type="line",x0=min(gre_score_arr),x1=max(gre_score_arr),y0=min(y),y1=max(y))])
+fig.show()
+
+x = 650
+y = m * x + c
+print(f"The chances of admit for Gre Score 650 is {y}")
+
+

@@ -1,0 +1,98 @@
+from google.colab import files
+data_to_load = files.upload()
+
+import pandas as pd
+import plotly.express as px
+
+df = pd.read_csv("C115_TA.csv")
+
+
+
+score_list = df["Score"].tolist()
+accepted_list = df["Accepted"].tolist()
+
+fig = px.scatter(x=score_list,y=accepted_list)
+fig.show()
+
+
+import numpy as np
+
+score_array = np.array(score_list)
+accepted_array = np.array(accepted_list)
+
+m,c = np.polyfit(score_array,accepted_array,1)
+
+y=[]
+for x in score_array:
+  y_value = m * x + c
+  y.append(y_value)
+
+
+fig = px.scatter(x=score_array,y=accepted_array)
+fig.update_layout(shapes=[dict(type="line",x0=max(score_array),x1=min(score_array),y0=max(y),y1=min(y))])
+fig.show()
+
+import matplotlib.pyplot as plt
+from sklearn.linear_model import LogisticRegression
+
+# reshape an array to a form (len(score_list),1).. suppose len(score_list) = 100, then 100 inner arrays with inner array length 1.. 
+# Basically 100 rows, 1 column
+# The array x is required to be two-dimensional. It should have one column for each input, and the number of rows should be equal to the number of observations. 
+X = np.reshape(score_list,(len(score_list),1))
+Y = np.reshape(accepted_list, (len(accepted_list),1))
+
+#Training the data to predict the output later.
+lr = LogisticRegression()
+lr.fit(X,Y)
+
+
+plt.figure()
+#ravel is used to get back the 1D array
+plt.scatter(X.ravel(),Y,color="black",zorder=20)  #higher zorder means this will be the top most one
+
+
+def model(x):
+  return 1/(1+np.exp(-x))
+
+# evenly spaced numbers from 0 to 100, total of 200 values
+X_test = np.linspace(0,100,200)
+
+# 'b' as blue
+# 'g' as green
+# 'r' as red
+# 'c' as cyan
+# 'm' as magenta
+# 'y' as yellow
+# 'k' as black
+# 'w' as white
+
+chances = model(X_test*lr.coef_+lr.intercept_).ravel()
+
+plt.plot(X_test,chances,color="red",lineWidth = 3)
+plt.axhline(y=0,color="k",linestyle="-")
+plt.axhline(y=1,color="k",linestyle="-")
+plt.axhline(y=0.5,color="b",linestyle="--")
+
+# Point of intersection with the 0.5 threshold
+plt.axvline(x=X_test[165],color="b",linestyle="--")
+
+plt.ylabel("y");
+plt.xlabel("x")
+#limiting the x value
+plt.xlim(75,85)
+plt.show()
+
+
+
+user_score = float(input("Enter your score : "))
+
+chance= model(user_score * lr.coef_ + lr.intercept_).ravel()[0]
+
+if chance <= 0.01:
+  print("Student will not be accepted")
+elif chance>=1:
+  print("Student will be accepted")
+elif chance<0.5:
+  print("Student might not get accepted")
+else :
+  print("Student may get accepted")

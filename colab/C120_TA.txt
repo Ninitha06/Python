@@ -1,0 +1,50 @@
+from google.colab import files
+files_to_load = files.upload()
+
+import pandas as pd
+
+df = pd.read_csv("C120_TA.csv")
+
+
+
+X = df[['glucose','bloodpressure']]
+Y = df['diabetes']
+
+
+from sklearn.model_selection import train_test_split
+
+X_train,X_test,y_train,y_test = train_test_split(X,Y,test_size = 0.25, random_state=42)
+
+from sklearn.preprocessing import StandardScaler
+
+sc = StandardScaler()
+
+X_train = sc.fit_transform(X_train)
+X_test = sc.fit_transform(X_test)
+
+from sklearn.metrics import accuracy_score
+from sklearn.naive_bayes import GaussianNB
+
+nb = GaussianNB()
+nb.fit(X_train,y_train)
+
+y_predict1 = nb.predict(X_test)
+
+accuracy = accuracy_score(y_test,y_predict1)
+
+print("Accuracy :- ", accuracy)
+
+
+
+
+
+from sklearn.linear_model import LogisticRegression
+
+lr = LogisticRegression()
+lr.fit(X_train,y_train)
+
+y_predict2 = lr.predict(X_test)
+
+accuracy = accuracy_score(y_test,y_predict2)
+
+print("Accuracy :- ", accuracy)

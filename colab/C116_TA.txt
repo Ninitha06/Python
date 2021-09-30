@@ -1,0 +1,96 @@
+from google.colab import files
+filload = files.upload()
+
+import pandas as pd
+
+df = pd.read_csv("C116_TA.csv")
+
+import plotly.express as px
+
+salary= df["EstimatedSalary"].tolist()
+purchased = df["Purchased"].tolist()
+
+fig = px.scatter(x=salary,y=purchased)
+fig.show()
+
+import plotly.graph_objects as go
+
+age = df["Age"].tolist()
+
+colors=[]
+
+for data in purchased :
+  if(data ==1):
+    colors.append("green")
+  else:
+    colors.append("red")
+  
+fig = go.Figure(data=go.Scatter(x=salary,y=age,mode="markers",marker=dict(color=colors)))
+
+fig.show()
+
+
+from sklearn.model_selection import train_test_split
+
+# Forming 400 * 2 data
+factors = df[["EstimatedSalary","Age"]]
+
+# print(factors)
+
+purchases = df["Purchased"]
+
+#random_state makes sure same data is taken for training and testing
+salary_train,salary_test,purchase_train,purchase_test = train_test_split(factors,purchases,test_size=0.25,random_state=0)
+
+# print(salary_train[0:10])
+
+from sklearn.preprocessing import StandardScaler
+# In regression with multiple variables, if in different units, need to be standardized. (Standardizing consists in subtracting the mean and dividing by the standard deviation.)
+# standardize to normally distributed data (e.g. Gaussian with 0 mean and unit variance).
+sc = StandardScaler()
+
+salary_train = sc.fit_transform(salary_train)
+salary_test = sc.transform(salary_test)
+
+print(salary_train[0:10])
+
+from sklearn.linear_model import LogisticRegression
+
+lr = LogisticRegression(random_state=0)
+lr.fit(salary_train,purchase_train)
+
+# this is the output of above statement
+# LogisticRegression(C=1.0, class_weight=None, dual=False, fit_intercept=True,
+                  #  intercept_scaling=1, l1_ratio=None, max_iter=100,
+                  #  multi_class='auto', n_jobs=None, penalty='l2',
+                  #  random_state=0, solver='lbfgs', tol=0.0001, verbose=0,
+                  #  warm_start=False)
+
+
+purchase_pred = lr.predict(salary_test)
+
+#Find out accuracy
+
+from sklearn.metrics import accuracy_score
+
+print("Accuracy :- ", accuracy_score(purchase_test,purchase_pred))
+
+
+
+
+
+
+
+# New Section
+
+user_salary = int(input("Please enter salary :- "))
+user_age = int(input("Please enter age :- "))
+
+standard_data = sc.transform([[user_salary,user_age]])
+
+user_pred = lr.predict(standard_data)
+
+if user_pred[0] == 1:
+  print("Chances are high that he/she may buy an iPhone")
+else:
+  print("Very less chance for him/her to buy an iPhone")

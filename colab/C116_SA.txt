@@ -1,0 +1,75 @@
+from google.colab import files
+files_to_load = files.upload()
+
+import pandas as pd
+
+df = pd.read_csv("C116_SA.csv")
+
+hours_studied = df["Hours_studied"].tolist()
+results = df["results"].tolist()
+
+
+
+import plotly.express as px
+
+fig=px.scatter(x=hours_studied,y=results)
+fig.show()
+
+hours_slept = df['Hours_Slept'].tolist()
+
+import plotly.graph_objects as go
+
+colors=[]
+
+for data in results:
+  if data == 1:
+    colors.append("green")
+  else:
+    colors.append("red")
+
+
+fig = go.Figure(data=(go.Scatter(x=hours_studied,y=hours_slept,mode="markers",marker=dict(color=colors))))
+
+fig.show()
+
+from sklearn.model_selection import train_test_split
+
+factors = df[["Hours_Slept","Hours_studied"]]
+
+results = df["results"]
+
+factor_train,factor_test,result_train,result_test = train_test_split(factors,results,test_size=0.25,random_state=0)
+
+# Not required as both are in same units
+# from sklearn.preprocessing import StandardScaler
+
+# sc = StandardScaler()
+
+# factor_train = sc.fit_transform(factor_train)
+# result_train = sc.transform(result_train)
+
+
+from sklearn.linear_model import LogisticRegression
+
+lr = LogisticRegression(random_state=0)
+
+lr.fit(factor_train,result_train)
+
+result_pred = lr.predict(factor_test)
+
+from sklearn.metrics import accuracy_score
+
+print("Accuracy :- ",accuracy_score(result_pred,result_test))
+
+
+user_hours_slept = float(input("Enter hours slept :-"))
+user_hours_study = float(input("Enter hours studied :-"))
+
+user_factor = [[user_hours_slept,user_hours_study]]
+
+user_pred = lr.predict(user_factor)
+
+if user_pred[0] == 1 :
+  print("Student may pass")
+else: 
+  print("Student may fail")

@@ -1,0 +1,105 @@
+from google.colab import files
+files_to_load = files.upload()
+
+import pandas as pd
+import plotly.express as px
+
+df = pd.read_csv("C118.csv")
+
+print(df.head())
+
+fig = px.scatter(df,x="petal_size",y="sepal_size")
+fig.show()
+
+WCSS is the sum of squared distance between each point and the centroid in a cluster. When we plot the WCSS with the K value, the plot looks like an Elbow. As the number of clusters increases, the WCSS value will start to decrease.
+
+
+from sklearn.cluster import KMeans
+
+# Dataframe.iloc[] method is used when the index label of a data frame is something other than numeric series of 0, 1, 2, 3….n 
+# or in case the user doesn’t know the index label.
+
+# print(df)
+
+X = df.iloc[:,[0,1]].values
+
+# print(X)
+
+wcss = []
+
+# Range is taken as 11 as mostly there wont be more than 10 clusters.
+for i in range(1,11):
+  # initialisation method (k-means++ since it is one of the best algorithms to find the kmeans value) 
+  kmeans = KMeans(n_clusters=i,init="k-means++",random_state=42)
+  kmeans.fit(X)
+  wcss.append(kmeans.inertia_)
+
+
+print(wcss)
+
+Inertia measures how well a dataset was clustered by K-Means. It is calculated by measuring the distance between each data point and its centroid, squaring this distance, and summing these squares across one cluster. A good model is one with low inertia AND a low number of clusters ( K ).
+
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Size of chart - 10 units in width, 5 units in height
+# The figsize attribute allows us to specify the width and height of a figure in unit inches.
+plt.figure(figsize=(10,5))
+sns.lineplot(range(1,11),wcss,marker="o",color="red")
+plt.title("The Elbow Method")
+plt.xlabel("Number of clusters")
+plt.ylabel("WCSS")
+
+plt.show()
+
+
+
+In the elbow chart above, we can
+see that the WCSS value is
+decreasing significantly until the K
+= 3. Hence, we can see that our K
+is 3 for the data given.
+
+
+kmeans = KMeans(n_clusters=3,init="k-means++",random_state=42)
+
+y_kmeans = kmeans.fit_predict(X)
+
+print(X[y_kmeans==0,0])
+
+from matplotlib import markers
+# get all possible shapes
+all_shapes = markers.MarkerStyle.markers.keys()
+# print list of shapes
+all_shapes
+# ['.', ',', 'o', 'v', '^', '<', '>', '1', '2', '3', '4', '8', 's', 'p', '*', 'h', 'H', '+', 'x', 'D', 'd', '|', '_', 'P', 'X',
+# 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 'None', None, ' ', '']
+
+from matplotlib import markers
+
+# get all possible shapes
+all_shapes = markers.MarkerStyle.markers.keys()
+
+print(all_shapes)
+
+
+plt.figure(figsize=(15,7))
+# filter X where y_kmeans ==0 and extract both petal size and sepal size, so index 0, 1
+# can also be written as follows
+filteredX0 = X[y_kmeans==0]
+# print(filteredX0)
+print(kmeans.cluster_centers_)
+# filteredX1 = X[y_kmeans==1]
+# filteredX2 = X[y_kmeans==2]
+sns.scatterplot(filteredX0[:,0],filteredX0[:,1],color="yellow",label="Cluster 1")
+sns.scatterplot(X[y_kmeans==0,0],X[y_kmeans==0,1],color="yellow",label="Cluster 1")
+sns.scatterplot(X[y_kmeans==1,0],X[y_kmeans==1,1],color="green",label="Cluster 2")
+sns.scatterplot(X[y_kmeans==2,0],X[y_kmeans==2,1],color="blue",label="Cluster 3")
+# 3 *2 matrix or array. Hence take all row values,0th column for x, all row values, 0th column for y  .. s is size of marker
+sns.scatterplot(kmeans.cluster_centers_[:,0],kmeans.cluster_centers_[:,1],color="red",label="Centroids",s=100,marker=',')
+plt.grid(False)
+plt.title("Cluster of Flowers")
+plt.xlabel("Petal size")
+plt.ylabel("Sepal size")
+plt.legend()
+plt.show()
