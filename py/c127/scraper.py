@@ -24,7 +24,7 @@ time.sleep(10)
 def scrape():
     headers = ["name", "light_years_from_earth", "planet_mass", "stellar_magnitude", "discovery_date"]
     planet_data = []
-    for i in range(0, 457):
+    for i in range(0, 458):
         soup = BeautifulSoup(browser.page_source, "html.parser")
         # Under Elements of Inspect, first icon to highlight which tag each element in page represents
         for ul_tag in soup.find_all("ul", attrs={"class", "exoplanet"}):
@@ -39,13 +39,16 @@ def scrape():
                     except:
                         temp_list.append("")
             planet_data.append(temp_list)
-        #browser.find_element_by_xpath('//*[@id="primary_column"]/footer/div/div/div/nav/span[2]/a').click()
-        browser.find_element_by_xpath('//*[@id="primary_column"]/footer/div/div/div/nav/span[@class="next"]/a').click()
+        
+        browser.find_element_by_xpath('//*[@id="primary_column"]/footer/div/div/div/nav/span[2]/a').click()
+        # browser.find_element_by_xpath('//*[@id="primary_column"]/footer/div/div/div/nav/span[@class="next"]/a').click()
         # Site causes issues if next arrow is clicked very fast
         time.sleep(2)
+      
         # w+ creates the file if it does not exists
-    with open("scrapper_2.csv", "w+") as f:
-        csvwriter = csv.writer(f)
+        # newline='' writes csvs without creating empty rows.
+    with open("scrapper_2.csv", "w+",newline='') as f:
+        csvwriter = csv.writer(f) 
         csvwriter.writerow(headers)
         csvwriter.writerows(planet_data)
 scrape()
