@@ -41,6 +41,7 @@ def scrape():
             planet_data.append(temp_list)
         
         browser.find_element_by_xpath('//*[@id="primary_column"]/footer/div/div/div/nav/span[2]/a').click()
+        # last page has next disabled as class
         # browser.find_element_by_xpath('//*[@id="primary_column"]/footer/div/div/div/nav/span[@class="next"]/a').click()
         # Site causes issues if next arrow is clicked very fast
         time.sleep(2)
