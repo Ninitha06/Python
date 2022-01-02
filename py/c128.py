@@ -4,6 +4,7 @@ import time
 import requests
 import csv
 #To install Chrome Driver on runtime.
+# pip install webdriver_manager
 from webdriver_manager.chrome import ChromeDriverManager
 START_URL = "https://exoplanets.nasa.gov/exoplanet-catalog/"
 
@@ -16,7 +17,7 @@ START_URL = "https://exoplanets.nasa.gov/exoplanet-catalog/"
 # browser = webdriver.Chrome(ChromeDriverManager().install(),options=chrome_options)
 browser = webdriver.Chrome(ChromeDriverManager().install())
 
-headers = ["name", "light_years_from_earth", "planet_mass", "stellar_magnitude", "discovery_date","hyperlink","planet_type","discovery_date","mass", "planet_radius", "orbital_radius", "orbital_period", "eccentricity"]
+headers = ["name", "light_years_from_earth", "planet_mass", "stellar_magnitude", "discovery_date","hyperlink","planet_type", "planet_radius", "orbital_radius", "orbital_period", "eccentricity"]
 planet_data = []
 new_planet_data = []
 
@@ -48,7 +49,7 @@ def scrape():
         browser.find_element_by_xpath('//*[@id="primary_column"]/footer/div/div/div/nav/span[2]/a').click()
         # browser.find_element_by_xpath('//*[@id="primary_column"]/footer/div/div/div/nav/span[@class="next"]/a').click()
         # Site causes issues if next arrow is clicked very fast
-        time.sleep(2)
+        time.sleep(3)
 
   
 def scrape_more_data(hyperlink):
@@ -86,7 +87,7 @@ for index, data in enumerate(planet_data):
     new_planet_data_element = new_planet_data_element[:7]
     final_planet_data.append(data + new_planet_data_element)
 
-with open("final.csv", "w+",newline='') as f:
+with open("scraping_final.csv", "w+",newline='') as f:
         csvwriter = csv.writer(f)
         csvwriter.writerow(headers)
         csvwriter.writerows(final_planet_data)
